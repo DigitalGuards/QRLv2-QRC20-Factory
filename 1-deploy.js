@@ -20,17 +20,19 @@ const deployMyTokenContract = async () => {
     
     const output = contractCompiler.GetCompilerOutput()
 
-    console.log(output)
+    console.log(output.contracts)
 
-    const contractABI = output.contracts['MyToken.sol']['MyToken'].abi
-
-    console.log(contractABI)
-    throw new Error("custom")
+    const contractABI = output.contracts['CustomERC20Factory.sol']['CustomERC20Factory'].abi
     
-    const contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
+    const contractByteCode = output.contracts['CustomERC20Factory.sol']['CustomERC20Factory'].evm.bytecode.object
     const contract = new web3.zond.Contract(contractABI)
     
-    const deployOptions = {data: contractByteCode, arguments: ["TOKEN123", "TOK"]}
+    const deployOptions = {data: contractByteCode, arguments: []}
+
+    console.log(contractABI)
+    
+    throw new Error("custom")
+    
     const contractDeploy = contract.deploy(deployOptions)
     const estimatedGas = await contractDeploy.estimateGas({from: acc.address})
     const txObj = {type: '0x2', gas: estimatedGas, from: acc.address, data: contractDeploy.encodeABI()}
