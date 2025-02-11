@@ -30,6 +30,21 @@ function findImports(path) {
             contents:
                 fs.readFileSync("./contracts/IERC20.sol").toString()
         };
+    else if (path === 'IERC20Metadata.sol')
+        return {
+            contents:
+                fs.readFileSync("./contracts/IERC20Metadata.sol").toString()
+        };
+    else if (path === 'Context.sol')
+        return {
+            contents:
+                fs.readFileSync("./contracts/Context.sol").toString()
+        };
+    else if (path === 'draft-IERC6093.sol')
+        return {
+            contents:
+                fs.readFileSync("./contracts/draft-IERC6093.sol").toString()
+        };
     else return { error: 'File not found' };
 }
 
