@@ -1,15 +1,14 @@
 const config = require("./config.json")
 const contractCompiler = require("./contract-compiler")
 const { Web3 } = require('@theqrl/web3')
+const { GetHexSeedFromMnemonic } = require("./getHexSeedFromMnemonic")
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider))
 
-if(config.hexseed == "hexseed_here") {
-    console.log("You need a to enter a dilithium hexseed for this to work.")
-    process.exit(1)
-}
+const mnemonic = process.env.MNEMONIC;
+const hexseed = GetHexSeedFromMnemonic(mnemonic);
 
-const acc = web3.zond.accounts.seedToAccount(config.hexseed)
-web3.zond.wallet?.add(config.hexseed)
+const acc = web3.zond.accounts.seedToAccount(hexseed)
+web3.zond.wallet?.add(hexseed)
 web3.zond.transactionConfirmationBlocks = config.tx_required_confirmations
 
 const receiptHandler = function(receipt){
@@ -21,7 +20,13 @@ const deployMyTokenContract = async () => {
     
     const output = contractCompiler.GetCompilerOutput()
 
+    console.log(output)
+
     const contractABI = output.contracts['MyToken.sol']['MyToken'].abi
+
+    console.log(contractABI)
+    throw new Error("custom")
+    
     const contractByteCode = output.contracts['MyToken.sol']['MyToken'].evm.bytecode.object
     const contract = new web3.zond.Contract(contractABI)
     
