@@ -1,16 +1,18 @@
-const Web3 = require('@theqrl/web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:4545'))
+const { Web3 } = require('@theqrl/web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('https://qrlwallet.com/api/zond-rpc/testnet'))
 
-const contractAddress = "0xfddea5fdd39fc4d1fafdf5ab3d8220bd7bde6a86"
+const contractAddress = "0x51f688101f10ea1a780a97a6308257f376c3841e"
 
 const getCode = async () => {
-    web3.zond.getCode(contractAddress, function(result, error) {
-        if(error) {
-            console.log(error)
-        } else {
-            console.log(result)
-        }
-    });
+    const result = await web3.zond.getCode(contractAddress, "latest");
+    console.log(result)
+    // web3.zond.getCode(contractAddress, "latest", function(result, error) {
+    //     if(error) {
+    //         console.log(error)
+    //     } else {
+    //         console.log(result)
+    //     }
+    // });
 }
 
 getCode()

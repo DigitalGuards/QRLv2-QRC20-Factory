@@ -7,7 +7,7 @@ var input = {
     sources: {
         'CustomERC20Factory.sol': {
             content: fs.readFileSync("./contracts/CustomERC20Factory.sol").toString(),
-        }           
+        }
     },
     settings: {
         outputSelection: {
@@ -20,10 +20,10 @@ var input = {
 
 /* All imports of solidity contract should be mentioned here (if any) otherwise should be left blank */
 function findImports(path) {
-    if (path === "CustomERC20.sol")
+    if (path === 'CustomERC20.sol')
         return {
             contents:
-                fs.readFileSync("./contracts/CustomERC20.sol").toString()
+                fs.readFileSync('./contracts/CustomERC20.sol').toString()
         }
     else if (path === 'ERC20.sol')
         return {
@@ -45,11 +45,6 @@ function findImports(path) {
             contents:
                 fs.readFileSync("./contracts/Context.sol").toString()
         };
-    else if (path === 'draft-IERC6093.sol')
-        return {
-            contents:
-                fs.readFileSync("./contracts/draft-IERC6093.sol").toString()
-        };
     else if (path === 'Ownable.sol')
         return {
             contents:
@@ -59,7 +54,7 @@ function findImports(path) {
 }
 
 function GetCompilerOutput() {
-    return JSON.parse(solc.compile(JSON.stringify(input), {import: findImports}))
+    return JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }))
 }
 
 module.exports = {

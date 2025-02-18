@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
 import "./ERC20.sol";
 import "./Ownable.sol";
@@ -22,7 +22,7 @@ contract CustomERC20 is ERC20, Ownable {
         address owner_,
         uint256 maxWalletAmount_,
         uint256 maxTxLimit_
-    ) ERC20(name_, symbol_) Ownable(owner_ != address(0)? owner_ : msg.sender) {
+    ) ERC20(name_, symbol_) Ownable() {
         _decimals = decimals_;
         maxSupply = maxSupply_ > 0 ? maxSupply_ : type(uint256).max; // Default to unlimited if not set
         maxWalletAmount = maxWalletAmount_;
@@ -33,6 +33,11 @@ contract CustomERC20 is ERC20, Ownable {
 
         _isExcludedFromLimits[initialRecipient] = true;
         _isExcludedFromLimits[owner_] = true;
+
+        // owner_ != address(0)? owner_ : msg.sender
+        if(owner_ != address(0)) {
+            transferOwnership(owner_);
+        }
     }
 
     function decimals() public view override returns (uint8) {
@@ -60,36 +65,5 @@ contract CustomERC20 is ERC20, Ownable {
             return false;
         }
         return true;
-    }
-}
-
-contract TokenFactory {
-    event TokenCreated(address tokenAddress, string name, string symbol, uint256 initialSupply);
-
-    function createToken(
-        string memory name,
-        string memory symbol,
-        uint256 initialSupply,
-        uint8 decimals,
-        uint256 maxSupply,
-        address recipient,
-        address owner,
-        uint256 maxWalletAmount,
-        uint256 maxTxLimit
-    ) external returns (address) {
-        CustomERC20 newToken = new CustomERC20(
-            name,
-            symbol,
-            initialSupply,
-            decimals,
-            maxSupply,
-            recipient,
-            owner,
-            maxWalletAmount,
-            maxTxLimit
-        );
-
-        emit TokenCreated(address(newToken), name, symbol, initialSupply);
-        return address(newToken);
     }
 }
