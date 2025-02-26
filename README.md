@@ -58,7 +58,7 @@ After that, deploy the smart contract
 node 1-deploy.js
 ```
 
-It should return a decent sized json response. While it's being confirmed (12 confirmations with the default config), take your `contractAddress`, and put it in the `contract_address` section of `config.json`
+It should return a decent sized json response. While it's being confirmed (2 confirmations with the default config), take your `contractAddress`, and put it in the `contract_address` section of `config.json`
 
 ```
 {
@@ -99,7 +99,7 @@ Your `config.json` file should look now look something like this:
     "provider":"http://45.76.43.83:4545",
     "hexseed":"0xa76b9cac647b68bf6a0e9fb0c53133ea5ff2efade54ba67aef1aa8a9e22b86b750bb8d7301aae6f309ddb20b3e1a1995",
     "contract_address":"Zecf54b758c2793466FD48517E5E84313Dc5C89ee",
-    "tx_required_confirmations": 12
+    "tx_required_confirmations": 2
 }
 ```
 

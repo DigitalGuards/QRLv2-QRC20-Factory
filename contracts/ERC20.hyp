@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.9.0) (token/ERC20/ERC20.sol)
+pragma hyperion ^0.0.2;
 
-pragma solidity ^0.8.0;
-
-import "./IERC20.sol";
-import "./IERC20Metadata.sol";
-import "./Context.sol";
+import "./IERC20.hyp";
+import "./IERC20Metadata.hyp";
+import "./Context.hyp";
 
 /**
  * @dev Implementation of the {IERC20} interface.
