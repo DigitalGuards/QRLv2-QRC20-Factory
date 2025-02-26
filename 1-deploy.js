@@ -31,8 +31,8 @@ const deployMyTokenContract = async () => {
 
     const contractABI = output.contracts['CustomERC20Factory.hyp']['CustomERC20Factory'].abi
 
-    fs.writeFileSync("./CustomERC20FactoryABI.json", JSON.stringify(contractABI, null, 4), 'utf-8')
-    throw new Error("custom");
+    // fs.writeFileSync("./CustomERC20FactoryABI.json", JSON.stringify(contractABI, null, 4), 'utf-8')
+    // throw new Error("custom");
 
     const contractByteCode = output.contracts['CustomERC20Factory.hyp']['CustomERC20Factory'].zvm.bytecode.object
     const contract = new web3.zond.Contract(contractABI)
