@@ -43,6 +43,16 @@ const handleReceipt = (data) => {
     );
 };
 
+const tokenName = "Zond Token"
+const tokenSymbol = "ZT"
+const initialSupply = "1000000000000000000000000000"
+const decimals = 18
+const maxSupply = "1000000000000000000000000000"
+const recipiet = "Z0000000000000000000000000000000000000000"
+const owner = "Z0000000000000000000000000000000000000000"
+const maxWalletAmount = "100000000000000000000000"
+const maxTxLimit = "100000000000000000000000"
+
 const deployCustomERC20Token = async () => {
     console.log('Attempting to call the contract transfer method from account:', acc.address)
 
@@ -52,7 +62,7 @@ const deployCustomERC20Token = async () => {
 
     const contract = new web3.zond.Contract(contractABI, contractAddress)
 
-    const contractTransfer = contract.methods.createToken("TOKEN", "TOK", "1000000000000000000000000000", 18, "1000000000000000000000000000", "Z0000000000000000000000000000000000000000", "Z0000000000000000000000000000000000000000", "100000000000000000000000", "100000000000000000000000");
+    const contractTransfer = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipiet, owner, maxWalletAmount, maxTxLimit);
     const estimatedGas = await contractTransfer.estimateGas({ "from": acc.address })
     const txObj = { type: '0x2', gas: Number(estimatedGas) * 2, from: acc.address, data: contractTransfer.encodeABI(), to: contractAddress }
 
