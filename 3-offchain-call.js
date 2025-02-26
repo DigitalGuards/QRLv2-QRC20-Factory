@@ -1,21 +1,26 @@
 const config = require("./config.json")
 const contractCompiler = require("./contract-compiler")
 const { Web3 } = require('@theqrl/web3')
-const web3 = new Web3(new Web3.providers.HttpProvider(config.provider))
+const fs = require('fs');
+require('dotenv').config()
 
-if(config.contract_address == "contract_address_here") {
-    console.log("You need a to enter your contract address for this to work.")
-    process.exit(1)
-}
+const provider = process.env.RPC_URL
+const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
-const accAddress = "0x2073a9893a8a2c065bf8d0269c577390639ecefa"
+const customERC20ADdress = process.env.CUSTOM_ERC20_ADDRESS;
+
+const accAddress = "Z2019EA08f4e24201B98f9154906Da4b924A04892"
 
 const checkMyTokenBalance = async () => {
-    console.log('Attempting to check MyToken balance for account:', accAddress)
+    console.log('Attempting to check Token balance for account:', accAddress)
 
     const output = contractCompiler.GetCompilerOutput()
-    const contractABI = output.contracts['MyToken.sol']['MyToken'].abi
-    const contract = new web3.zond.Contract(contractABI, config.contract_address)
+    const contractABI = output.contracts['CustomERC20.hyp']['CustomERC20'].abi
+
+    // fs.writeFileSync("./CustomERC20ABI.json", JSON.stringify(contractABI, null, 4), 'utf-8')
+    // throw new Error("custom")
+    
+    const contract = new web3.zond.Contract(contractABI, customERC20ADdress)
     contract.methods.balanceOf(accAddress).call().then((result, error)=>{
         if(error) {
             console.log(error)

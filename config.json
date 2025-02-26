@@ -1,6 +1,6 @@
 {
-    "provider":"https://qrlwallet.com/api/zond-rpc/testnet",
+    "provider":"http://127.0.0.1:8545",
     "hexseed":"hexseed_here",
-    "contract_address":"0xf466bb03d0fe24547d6c4287fbb2f418256755b2",
-    "tx_required_confirmations": 12
+    "contract_address":"contract_address_here",
+    "tx_required_confirmations": 2
 }

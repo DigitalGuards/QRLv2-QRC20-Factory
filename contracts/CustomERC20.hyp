@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma hyperion ^0.0.2;
 
-import "./ERC20.sol";
-import "./Ownable.sol";
+import "./ERC20.hyp";
+import "./Ownable.hyp";
 
 contract CustomERC20 is ERC20, Ownable {
     uint8 private immutable _decimals;
@@ -28,16 +28,12 @@ contract CustomERC20 is ERC20, Ownable {
         maxWalletAmount = maxWalletAmount_;
         maxTxLimit = maxTxLimit_;
 
-        address initialRecipient = recipient_ == address(0) ? msg.sender : recipient_;
-        _mint(initialRecipient, initialSupply_);
+        _mint(recipient_, initialSupply_);
 
-        _isExcludedFromLimits[initialRecipient] = true;
+        _isExcludedFromLimits[recipient_] = true;
         _isExcludedFromLimits[owner_] = true;
 
-        // owner_ != address(0)? owner_ : msg.sender
-        if(owner_ != address(0)) {
-            transferOwnership(owner_);
-        }
+        transferOwnership(owner_);
     }
 
     function decimals() public view override returns (uint8) {

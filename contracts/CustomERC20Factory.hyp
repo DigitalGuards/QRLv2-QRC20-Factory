@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma hyperion ^0.0.2;
 
-import "./CustomERC20.sol";
+import "./CustomERC20.hyp";
 
 contract CustomERC20Factory {
     event TokenCreated(address indexed tokenAddress, address indexed owner);
@@ -17,19 +17,22 @@ contract CustomERC20Factory {
         uint256 maxWalletAmount_,
         uint256 maxTxLimit_
     ) external returns (address) {
+        address _initialRecipient = recipient_ == address(0) ? msg.sender : recipient_;
+        address _owner = owner_ == address(0) ? msg.sender : owner_;
+
         CustomERC20 newToken = new CustomERC20(
             name_,
             symbol_,
             initialSupply_,
             decimals_,
             maxSupply_,
-            recipient_,
-            owner_,
+            _initialRecipient,
+            _owner,
             maxWalletAmount_,
             maxTxLimit_
         );
 
-        emit TokenCreated(address(newToken), owner_);
+        emit TokenCreated(address(newToken), owner_ == address(0) ? msg.sender : owner_);
         return address(newToken);
     }
 }
