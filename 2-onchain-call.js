@@ -62,9 +62,9 @@ const createCustomQRC20Token = async () => {
 
     const contract = new web3.qrl.Contract(contractABI, contractAddress)
 
-    const contractTransfer = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipient, owner, maxWalletAmount, maxTxLimit);
-    const estimatedGas = await contractTransfer.estimateGas({ "from": acc.address })
-    const txObj = { type: '0x2', gas: Number(estimatedGas) * 2, from: acc.address, data: contractTransfer.encodeABI(), to: contractAddress }
+    const createTokenMethod = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipient, owner, maxWalletAmount, maxTxLimit);
+    const estimatedGas = await createTokenMethod.estimateGas({ "from": acc.address })
+    const txObj = { type: '0x2', gas: Number(estimatedGas) * 2, from: acc.address, data: createTokenMethod.encodeABI(), to: contractAddress }
 
     await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
         .on('confirmation', handleConfirmation)
