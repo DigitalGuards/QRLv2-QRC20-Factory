@@ -33,6 +33,8 @@ contract CustomERC20 is ERC20, Ownable {
         uint256 maxWalletAmount_,
         uint256 maxTxLimit_
     ) ERC20(name_, symbol_) Ownable() {
+        require(bytes(name_).length > 0, "CustomERC20: empty name");
+        require(bytes(symbol_).length > 0, "CustomERC20: empty symbol");
         require(decimals_ <= 18, "CustomERC20: decimals > 18");
         require(maxSupply_ > 0, "CustomERC20: maxSupply is zero");
         require(initialSupply_ <= maxSupply_, "CustomERC20: initialSupply exceeds maxSupply");
