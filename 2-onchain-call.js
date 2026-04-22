@@ -49,7 +49,6 @@ const initialSupply = "1000000000000000000000000000"
 const decimals = 18
 const maxSupply = "1000000000000000000000000000"
 const recipient = "Q0000000000000000000000000000000000000000"
-const owner = "Q0000000000000000000000000000000000000000"
 const maxWalletAmount = "100000000000000000000000"
 const maxTxLimit = "100000000000000000000000"
 
@@ -62,7 +61,7 @@ const createCustomQRC20Token = async () => {
 
     const contract = new web3.qrl.Contract(contractABI, contractAddress)
 
-    const createTokenMethod = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipient, owner, maxWalletAmount, maxTxLimit);
+    const createTokenMethod = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipient, maxWalletAmount, maxTxLimit);
     const estimatedGas = await createTokenMethod.estimateGas({ from: acc.address })
     const gas = (estimatedGas * 12n) / 10n
     const gasPrice = await web3.qrl.getGasPrice()
