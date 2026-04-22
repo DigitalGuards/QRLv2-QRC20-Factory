@@ -62,10 +62,12 @@ contract CustomERC20 is ERC20, Ownable {
 
     /**
      * @notice Mint `amount` new tokens to `to`. Only callable by the owner.
-     *         Reverts if `totalSupply() + amount > maxSupply`.
+     *         Reverts if `totalSupply() + amount > maxSupply`. Uses
+     *         subtraction form to guarantee the revert message fires
+     *         regardless of how the compiler handles arithmetic overflow.
      */
     function mint(address to, uint256 amount) external onlyOwner {
-        require(totalSupply() + amount <= maxSupply, "CustomERC20: exceeds maxSupply");
+        require(amount <= maxSupply - totalSupply(), "CustomERC20: exceeds maxSupply");
         _mint(to, amount);
     }
 
