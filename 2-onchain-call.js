@@ -17,9 +17,9 @@ if (!hexseed) {
     process.exit(1)
 }
 
-const acc = web3.zond.accounts.seedToAccount(hexseed)
-web3.zond.wallet?.add(hexseed)
-web3.zond.transactionConfirmationBlocks = config.tx_required_confirmations
+const acc = web3.qrl.accounts.seedToAccount(hexseed)
+web3.qrl.wallet?.add(hexseed)
+web3.qrl.transactionConfirmationBlocks = config.tx_required_confirmations
 
 const handleConfirmation = (data) => {
     fs.writeFileSync(
@@ -43,33 +43,35 @@ const handleReceipt = (data) => {
     );
 };
 
-const tokenName = "Zond Token"
-const tokenSymbol = "ZT"
+const tokenName = "QRL Token"
+const tokenSymbol = "QT"
 const initialSupply = "1000000000000000000000000000"
 const decimals = 18
 const maxSupply = "1000000000000000000000000000"
-const recipiet = "Z0000000000000000000000000000000000000000"
-const owner = "Z0000000000000000000000000000000000000000"
+const recipient = "Q0000000000000000000000000000000000000000"
+const owner = "Q0000000000000000000000000000000000000000"
 const maxWalletAmount = "100000000000000000000000"
 const maxTxLimit = "100000000000000000000000"
 
-const deployCustomERC20Token = async () => {
-    console.log('Attempting to call the contract transfer method from account:', acc.address)
+const createCustomQRC20Token = async () => {
+    console.log('Attempting to call the contract createToken method from account:', acc.address)
 
     let output = contractCompiler.GetCompilerOutput()
 
     const contractABI = output.contracts['CustomERC20Factory.hyp']['CustomERC20Factory'].abi
 
-    const contract = new web3.zond.Contract(contractABI, contractAddress)
+    const contract = new web3.qrl.Contract(contractABI, contractAddress)
 
-    const contractTransfer = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipiet, owner, maxWalletAmount, maxTxLimit);
-    const estimatedGas = await contractTransfer.estimateGas({ "from": acc.address })
-    const txObj = { type: '0x2', gas: Number(estimatedGas) * 2, from: acc.address, data: contractTransfer.encodeABI(), to: contractAddress }
+    const createTokenMethod = contract.methods.createToken(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipient, owner, maxWalletAmount, maxTxLimit);
+    const estimatedGas = await createTokenMethod.estimateGas({ from: acc.address })
+    const gas = (estimatedGas * 12n) / 10n
+    const gasPrice = await web3.qrl.getGasPrice()
+    const txObj = { gas, gasPrice, from: acc.address, data: createTokenMethod.encodeABI(), to: contractAddress }
 
-    await web3.zond.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
+    await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
         .on('confirmation', handleConfirmation)
         .on('receipt', handleReceipt)
         .on('error', console.error)
 }
 
-deployCustomERC20Token()
+createCustomQRC20Token()
