@@ -3,6 +3,12 @@ pragma hyperion ^0.0.2;
 
 import "./CustomERC20.hyp";
 
+/**
+ * @title CustomERC20Factory
+ * @notice Deploys {CustomERC20} instances. The deployed token is owned by
+ *         `msg.sender`; initial supply is minted to `recipient_` (defaults to
+ *         `msg.sender` if zero).
+ */
 contract CustomERC20Factory {
     event TokenCreated(address indexed tokenAddress, address indexed owner);
 
@@ -13,12 +19,14 @@ contract CustomERC20Factory {
         uint8 decimals_,
         uint256 maxSupply_,
         address recipient_,
-        address owner_,
         uint256 maxWalletAmount_,
         uint256 maxTxLimit_
     ) external returns (address) {
+        require(decimals_ <= 18, "CustomERC20Factory: decimals > 18");
+        require(bytes(name_).length > 0, "CustomERC20Factory: empty name");
+        require(bytes(symbol_).length > 0, "CustomERC20Factory: empty symbol");
+
         address _initialRecipient = recipient_ == address(0) ? msg.sender : recipient_;
-        address _owner = owner_ == address(0) ? msg.sender : owner_;
 
         CustomERC20 newToken = new CustomERC20(
             name_,
@@ -27,12 +35,12 @@ contract CustomERC20Factory {
             decimals_,
             maxSupply_,
             _initialRecipient,
-            _owner,
+            msg.sender,
             maxWalletAmount_,
             maxTxLimit_
         );
 
-        emit TokenCreated(address(newToken), owner_ == address(0) ? msg.sender : owner_);
+        emit TokenCreated(address(newToken), msg.sender);
         return address(newToken);
     }
 }

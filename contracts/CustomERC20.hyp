@@ -4,6 +4,12 @@ pragma hyperion ^0.0.2;
 import "./ERC20.hyp";
 import "./Ownable.hyp";
 
+/**
+ * @title CustomERC20
+ * @notice QRC20 token with configurable supply cap, per-wallet cap, and per-tx cap.
+ *         The owner can mint up to `maxSupply`, adjust caps, and manage the
+ *         cap-bypass whitelist post-deploy. `maxSupply` is immutable.
+ */
 contract CustomERC20 is ERC20, Ownable {
     uint8 private immutable _decimals;
     uint256 public immutable maxSupply;
@@ -11,6 +17,10 @@ contract CustomERC20 is ERC20, Ownable {
     uint256 public maxTxLimit;
 
     mapping(address => bool) private _isExcludedFromLimits;
+
+    event MaxWalletAmountUpdated(uint256 previousValue, uint256 newValue);
+    event MaxTxLimitUpdated(uint256 previousValue, uint256 newValue);
+    event ExcludedFromLimitsUpdated(address indexed account, bool excluded);
 
     constructor(
         string memory name_,
@@ -23,21 +33,93 @@ contract CustomERC20 is ERC20, Ownable {
         uint256 maxWalletAmount_,
         uint256 maxTxLimit_
     ) ERC20(name_, symbol_) Ownable() {
+        require(bytes(name_).length > 0, "CustomERC20: empty name");
+        require(bytes(symbol_).length > 0, "CustomERC20: empty symbol");
+        require(decimals_ <= 18, "CustomERC20: decimals > 18");
+        require(maxSupply_ > 0, "CustomERC20: maxSupply is zero");
+        require(initialSupply_ <= maxSupply_, "CustomERC20: initialSupply exceeds maxSupply");
+        require(owner_ != address(0), "CustomERC20: owner is zero");
+        require(recipient_ != address(0), "CustomERC20: recipient is zero");
+
         _decimals = decimals_;
-        maxSupply = maxSupply_ > 0 ? maxSupply_ : type(uint256).max; // Default to unlimited if not set
+        maxSupply = maxSupply_;
         maxWalletAmount = maxWalletAmount_;
         maxTxLimit = maxTxLimit_;
 
         _mint(recipient_, initialSupply_);
 
         _isExcludedFromLimits[recipient_] = true;
-        _isExcludedFromLimits[owner_] = true;
+        emit ExcludedFromLimitsUpdated(recipient_, true);
 
+        // transferOwnership will move exclusion from the deploying contract
+        // (factory / EOA) to owner_ via the _transferOwnership override.
         transferOwnership(owner_);
     }
 
     function decimals() public view override returns (uint8) {
         return _decimals;
+    }
+
+    /**
+     * @notice Mint `amount` new tokens to `to`. Only callable by the owner.
+     *         Reverts if `totalSupply() + amount > maxSupply`.
+     */
+    function mint(address to, uint256 amount) external onlyOwner {
+        require(totalSupply() + amount <= maxSupply, "CustomERC20: exceeds maxSupply");
+        _mint(to, amount);
+    }
+
+    /**
+     * @notice Set the per-wallet holding cap. Zero disables the cap.
+     */
+    function setMaxWalletAmount(uint256 newValue) external onlyOwner {
+        emit MaxWalletAmountUpdated(maxWalletAmount, newValue);
+        maxWalletAmount = newValue;
+    }
+
+    /**
+     * @notice Set the per-tx transfer cap. Zero disables the cap.
+     */
+    function setMaxTxLimit(uint256 newValue) external onlyOwner {
+        emit MaxTxLimitUpdated(maxTxLimit, newValue);
+        maxTxLimit = newValue;
+    }
+
+    /**
+     * @notice Add or remove `account` from the cap-bypass whitelist.
+     *         Whitelisted accounts bypass both maxWalletAmount and maxTxLimit
+     *         on both the sender and recipient side.
+     */
+    function setExcludedFromLimits(address account, bool excluded) external onlyOwner {
+        _isExcludedFromLimits[account] = excluded;
+        emit ExcludedFromLimitsUpdated(account, excluded);
+    }
+
+    /**
+     * @notice Returns true if `account` is exempt from per-wallet / per-tx caps.
+     */
+    function isExcludedFromLimits(address account) external view returns (bool) {
+        return _isExcludedFromLimits[account];
+    }
+
+    /**
+     * @dev Keeps the cap-bypass whitelist aligned with the owner role across
+     *      ownership handoffs. Renouncing ownership (newOwner == address(0))
+     *      still revokes the old owner's exemption; a follow-up
+     *      setExcludedFromLimits(oldOwner, true) by the new owner can restore
+     *      it if desired.
+     */
+    function _transferOwnership(address newOwner) internal override {
+        address oldOwner = owner();
+        if (oldOwner != address(0) && oldOwner != newOwner) {
+            _isExcludedFromLimits[oldOwner] = false;
+            emit ExcludedFromLimitsUpdated(oldOwner, false);
+        }
+        if (newOwner != address(0) && !_isExcludedFromLimits[newOwner]) {
+            _isExcludedFromLimits[newOwner] = true;
+            emit ExcludedFromLimitsUpdated(newOwner, true);
+        }
+        super._transferOwnership(newOwner);
     }
 
     function transfer(address recipient, uint256 amount) public override returns (bool) {
