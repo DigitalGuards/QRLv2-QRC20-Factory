@@ -40,7 +40,8 @@ const deployMyTokenContract = async () => {
     const deployOptions = { data: contractByteCode, arguments: [] }
     const contractDeploy = contract.deploy(deployOptions)
     const estimatedGas = await contractDeploy.estimateGas({ from: acc.address })
-    const txObj = { type: '0x2', gas: estimatedGas, from: acc.address, data: contractDeploy.encodeABI() }
+    const gasPrice = await web3.zond.getGasPrice()
+    const txObj = { type: '0x2', gas: estimatedGas, gasPrice: gasPrice, from: acc.address, data: contractDeploy.encodeABI() }
 
     await web3.zond.sendTransaction(txObj, undefined, { checkRevertBeforeSending: false })
         .on('confirmation', console.log)
