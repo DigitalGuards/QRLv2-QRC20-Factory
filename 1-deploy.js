@@ -39,7 +39,7 @@ const deployMyTokenContract = async () => {
     const gasPrice = await web3.qrl.getGasPrice()
     const txObj = { type: '0x2', gas: estimatedGas, gasPrice: gasPrice, from: acc.address, data: contractDeploy.encodeABI() }
 
-    await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: false })
+    await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
         .on('confirmation', console.log)
         .on('receipt', receiptHandler)
         .on('error', console.error)
