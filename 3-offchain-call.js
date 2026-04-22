@@ -7,9 +7,9 @@ require('dotenv').config()
 const provider = process.env.RPC_URL
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
-const customERC20ADdress = process.env.CUSTOM_ERC20_ADDRESS;
+const customQRC20Address = process.env.CUSTOM_ERC20_ADDRESS;
 
-const accAddress = "Z2019EA08f4e24201B98f9154906Da4b924A04892"
+const accAddress = process.env.HOLDER_ADDRESS || "Q0000000000000000000000000000000000000000"
 
 const checkTokenInfo = async () => {
     console.log('Attempting to check Token info for account:', accAddress)
@@ -17,7 +17,7 @@ const checkTokenInfo = async () => {
     const output = contractCompiler.GetCompilerOutput()
     const contractABI = output.contracts['CustomERC20.hyp']['CustomERC20'].abi
 
-    const contract = new web3.zond.Contract(contractABI, customERC20ADdress)
+    const contract = new web3.qrl.Contract(contractABI, customQRC20Address)
     
     try {
         const name = await contract.methods.name().call()

@@ -16,9 +16,9 @@ if (!hexseed) {
     process.exit(1)
 }
 
-const acc = web3.zond.accounts.seedToAccount(hexseed)
-web3.zond.wallet?.add(hexseed)
-web3.zond.transactionConfirmationBlocks = config.tx_required_confirmations
+const acc = web3.qrl.accounts.seedToAccount(hexseed)
+web3.qrl.wallet?.add(hexseed)
+web3.qrl.transactionConfirmationBlocks = config.tx_required_confirmations
 
 const receiptHandler = function (receipt) {
     console.log("Contract address ", receipt.contractAddress)
@@ -30,20 +30,16 @@ const deployMyTokenContract = async () => {
     const output = contractCompiler.GetCompilerOutput()
 
     const contractABI = output.contracts['CustomERC20Factory.hyp']['CustomERC20Factory'].abi
-
-    // fs.writeFileSync("./CustomERC20FactoryABI.json", JSON.stringify(contractABI, null, 4), 'utf-8')
-    // throw new Error("custom");
-
     const contractByteCode = output.contracts['CustomERC20Factory.hyp']['CustomERC20Factory'].zvm.bytecode.object
-    const contract = new web3.zond.Contract(contractABI)
+    const contract = new web3.qrl.Contract(contractABI)
 
     const deployOptions = { data: contractByteCode, arguments: [] }
     const contractDeploy = contract.deploy(deployOptions)
     const estimatedGas = await contractDeploy.estimateGas({ from: acc.address })
-    const gasPrice = await web3.zond.getGasPrice()
+    const gasPrice = await web3.qrl.getGasPrice()
     const txObj = { type: '0x2', gas: estimatedGas, gasPrice: gasPrice, from: acc.address, data: contractDeploy.encodeABI() }
 
-    await web3.zond.sendTransaction(txObj, undefined, { checkRevertBeforeSending: false })
+    await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: false })
         .on('confirmation', console.log)
         .on('receipt', receiptHandler)
         .on('error', console.error)
