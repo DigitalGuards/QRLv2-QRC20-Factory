@@ -4,18 +4,26 @@ require('dotenv').config()
 const provider = process.env.RPC_URL
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
-const contractAddress = "Z38cad9d0889643c271a718ba98c99b32a6a8331c"
+const contractAddress = process.env.CUSTOM_ERC20_FACTORY_ADDRESS || process.env.CUSTOM_ERC20_ADDRESS
 
 const getCode = async () => {
-    const code = await web3.zond.getCode(contractAddress, 'latest', function(result, error) {
-        if(error) {
-            console.log(error)
-        } else {
-            console.log(result)
-        }
-    });
+    if (!contractAddress) {
+        console.error("Set CUSTOM_ERC20_FACTORY_ADDRESS or CUSTOM_ERC20_ADDRESS in .env")
+        process.exit(1)
+    }
 
-    console.log(code)
+    try {
+        const code = await web3.qrl.getCode(contractAddress, 'latest')
+        if (!code || code === '0x' || code === '0x0') {
+            console.log(`No contract deployed at ${contractAddress}`)
+        } else {
+            console.log(`Contract at ${contractAddress} has bytecode (${code.length} chars):`)
+            console.log(code)
+        }
+    } catch (error) {
+        console.error("getCode failed:", error)
+        process.exit(1)
+    }
 }
 
 getCode()

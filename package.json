@@ -1,16 +1,21 @@
 {
-  "name": "zond-contract-example",
-  "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "name": "qrlv2-qrc20-factory",
+  "version": "0.2.0",
+  "description": "Custom QRC20 token factory for the QRL v2 (post-quantum) chain",
+  "main": "1-deploy.js",
   "scripts": {
+    "deploy": "node 1-deploy.js",
+    "create-token": "node 2-onchain-call.js",
+    "token-info": "node 3-offchain-call.js",
+    "getcode": "node getcode.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@theqrl/hypc": "^0.0.2",
-    "@theqrl/web3": "^0.3.0",
+    "@theqrl/wallet.js": "^3.0.1",
+    "@theqrl/web3": "^0.4.0",
     "dotenv": "^16.4.7"
   }
 }

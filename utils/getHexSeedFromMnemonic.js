@@ -1,15 +1,14 @@
-const { MnemonicToSeedBin } = require("@theqrl/wallet.js");
-const { Buffer } = require("buffer");
-require("dotenv").config()
+const { MLDSA87 } = require("@theqrl/wallet.js");
+require("dotenv").config();
 
 const getHexSeedFromMnemonic = (mnemonic) => {
   if (!mnemonic) return "";
   const trimmedMnemonic = mnemonic.trim();
   if (!trimmedMnemonic) return "";
-  const seedBin = MnemonicToSeedBin(trimmedMnemonic);
-  return "0x".concat(Buffer.from(seedBin).toString("hex"));
+  const wallet = MLDSA87.newWalletFromMnemonic(trimmedMnemonic);
+  return wallet.getHexExtendedSeed();
 };
 
 module.exports = {
   getHexSeedFromMnemonic,
-}
+};
