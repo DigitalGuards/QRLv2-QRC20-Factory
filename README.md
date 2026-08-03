@@ -9,7 +9,7 @@ This project demonstrates the deployment and interaction with a custom QRC20 tok
 - Node.js 22 (managed via [nvm](https://github.com/nvm-sh/nvm))
 - npm
 - Access to a QRL v2 JSON-RPC node (the node exposes the `qrl_*` RPC namespace)
-- A funded QRL Dilithium (MLDSA87) wallet — 36-word mnemonic
+- A funded QRL Dilithium (MLDSA87) wallet with a 34-word mnemonic
 
 ## Setup
 
@@ -38,6 +38,7 @@ CUSTOM_ERC20_ADDRESS=your_token_contract_address_here
 
 ```json
 {
+    "chain_id": 1337,
     "tx_required_confirmations": 2
 }
 ```
@@ -75,10 +76,11 @@ Reads `name`, `symbol`, `decimals`, `totalSupply`, and the balance for `HOLDER_A
 
 ## v2 compatibility notes
 
-- Uses `@theqrl/web3 ^0.4.0` with the `qrl` namespace (`web3.qrl.*`) — legacy `web3.zond.*` calls will fail against a v2 node.
+- Uses `@theqrl/web3 ^0.4.0` with the `qrl` namespace (`web3.qrl.*`). Legacy `web3.zond.*` calls will fail against a v2 node.
 - Seed derivation uses `@theqrl/wallet.js ^3.0.1` (`MLDSA87.newWalletFromMnemonic(...).getHexExtendedSeed()`).
-- All contract and account addresses on v2 are **Q-prefixed**.
+- Write scripts require chain ID `1337` and abort before signing on a network mismatch.
+- Contract and account addresses use the current **Q + 40-hex** format.
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

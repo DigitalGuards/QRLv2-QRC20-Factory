@@ -1,11 +1,21 @@
 const config = require("./config.json")
 const contractCompiler = require("./contract-compiler")
 const { Web3 } = require('@theqrl/web3')
-const fs = require('fs');
 const { getHexSeedFromMnemonic } = require("./utils/getHexSeedFromMnemonic");
+const {
+    assertContractCode,
+    assertExpectedChain,
+    requireConfirmationCount,
+    requireExpectedChainId,
+    requireQAddress,
+    requireRpcUrl,
+    waitForTransactionConfirmations,
+} = require("./utils/deploymentSafety");
 require('dotenv').config()
 
-const provider = process.env.RPC_URL
+const provider = requireRpcUrl(process.env.RPC_URL)
+const expectedChainId = requireExpectedChainId(config.chain_id)
+const requiredConfirmations = requireConfirmationCount(config.tx_required_confirmations)
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
 const mnemonic = process.env.MNEMONIC
@@ -17,14 +27,12 @@ if (!hexseed) {
 }
 
 const acc = web3.qrl.accounts.seedToAccount(hexseed)
+requireQAddress(acc.address, "deployer address")
 web3.qrl.wallet?.add(hexseed)
-web3.qrl.transactionConfirmationBlocks = config.tx_required_confirmations
-
-const receiptHandler = function (receipt) {
-    console.log("Contract address ", receipt.contractAddress)
-}
 
 const deployMyTokenContract = async () => {
+    const chainId = await assertExpectedChain(web3, expectedChainId)
+    console.log(`Connected to chain ${chainId}`)
     console.log('Attempting to deploy CustomERC20Factory contract from account:', acc.address)
 
     const output = contractCompiler.GetCompilerOutput()
@@ -40,10 +48,20 @@ const deployMyTokenContract = async () => {
     const gasPrice = await web3.qrl.getGasPrice()
     const txObj = { gas, gasPrice, from: acc.address, data: contractDeploy.encodeABI() }
 
-    await web3.qrl.sendTransaction(txObj, undefined, { checkRevertBeforeSending: true })
-        .on('confirmation', console.log)
-        .on('receipt', receiptHandler)
-        .on('error', console.error)
+    const receipt = await web3.qrl.sendTransaction(
+        txObj,
+        undefined,
+        { checkRevertBeforeSending: true }
+    )
+    if (!receipt || !receipt.contractAddress) {
+        throw new Error("Deployment receipt did not contain a contract address")
+    }
+    await waitForTransactionConfirmations(web3, receipt, requiredConfirmations)
+    await assertContractCode(web3, receipt.contractAddress, "CustomERC20Factory")
+    console.log("Contract address:", receipt.contractAddress)
 }
 
-deployMyTokenContract()
+deployMyTokenContract().catch((error) => {
+    console.error("Deployment failed:", error.message)
+    process.exitCode = 1
+})
