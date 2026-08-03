@@ -1,6 +1,4 @@
 {
-    "provider":"http://127.0.0.1:8545",
-    "hexseed":"hexseed_here",
-    "contract_address":"contract_address_here",
+    "chain_id": 1337,
     "tx_required_confirmations": 2
 }
